@@ -3,9 +3,6 @@ const esbuild = require("esbuild");
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
 
-/**
- * @type {import('esbuild').Plugin}
- */
 const esbuildProblemMatcherPlugin = {
 	name: 'esbuild-problem-matcher',
 
@@ -23,30 +20,40 @@ const esbuildProblemMatcherPlugin = {
 	},
 };
 
+const sharedConfig = {
+	bundle: true,
+	sourcemap: !production,
+	sourcesContent: false,
+	logLevel: 'silent',
+	plugins: [esbuildProblemMatcherPlugin],
+};
+
 async function main() {
-	const ctx = await esbuild.context({
-		entryPoints: [
-			'src/extension.ts'
-		],
-		bundle: true,
+	const extensionCtx = await esbuild.context({
+		...sharedConfig,
+		entryPoints: ['src/extension.ts'],
 		format: 'cjs',
 		minify: production,
-		sourcemap: !production,
-		sourcesContent: false,
 		platform: 'node',
 		outfile: 'dist/extension.js',
 		external: ['vscode'],
-		logLevel: 'silent',
-		plugins: [
-			/* add to the end of plugins array */
-			esbuildProblemMatcherPlugin,
-		],
 	});
+
+	const webviewCtx = await esbuild.context({
+		...sharedConfig,
+		entryPoints: ['src/webview/main.ts'],
+		format: 'iife',
+		minify: production,
+		platform: 'browser',
+		target: ['es2021'],
+		outfile: 'dist/webview.js',
+	});
+
 	if (watch) {
-		await ctx.watch();
+		await Promise.all([extensionCtx.watch(), webviewCtx.watch()]);
 	} else {
-		await ctx.rebuild();
-		await ctx.dispose();
+		await Promise.all([extensionCtx.rebuild(), webviewCtx.rebuild()]);
+		await Promise.all([extensionCtx.dispose(), webviewCtx.dispose()]);
 	}
 }
 

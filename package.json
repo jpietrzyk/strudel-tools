@@ -14,8 +14,35 @@
   "contributes": {
     "commands": [
       {
-        "command": "strudel-tools.helloWorld",
-        "title": "Hello World"
+        "command": "strudel-tools.play",
+        "title": "Strudel: Play Current File"
+      },
+      {
+        "command": "strudel-tools.stop",
+        "title": "Strudel: Stop Playback"
+      },
+      {
+        "command": "strudel-tools.evaluate",
+        "title": "Strudel: Evaluate Selection"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "strudel-tools.playerView",
+          "name": "Strudel Player",
+          "webviewOptions": {
+            "retainContextWhenHidden": true
+          }
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "strudel",
+        "extensions": [".strudel"],
+        "aliases": ["Strudel"]
       }
     ]
   },
@@ -45,5 +72,8 @@
     "npm-run-all2": "^8.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.58.0"
+  },
+  "dependencies": {
+    "@strudel/web": "^1.3.0"
   }
 }

@@ -143,11 +143,9 @@ function evalNode(node: AstNode): unknown {
 
 async function init() {
 	if (initialized) { return; }
-	log('Disabling AudioWorklets (VS Code webview limitation)...');
-
 	const strudel = await import('@strudel/web');
 
-	strudel.initAudioOnFirstClick({ disableWorklets: true });
+	strudel.initAudioOnFirstClick({});
 	strudel.miniAllStrings();
 
 	log('Creating webaudioRepl (no transpiler)...');

@@ -65,7 +65,7 @@ export class StrudelView implements vscode.WebviewViewProvider {
 	<meta charset="UTF-8">
 	<meta http-equiv="Content-Security-Policy"
 		content="default-src 'none';
-			script-src ${webview.cspSource} blob:;
+			script-src ${webview.cspSource} blob: data:;
 			style-src ${webview.cspSource};
 			connect-src https: blob:;">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">

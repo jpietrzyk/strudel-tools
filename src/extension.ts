@@ -5,7 +5,10 @@ let strudelView: StrudelView;
 let statusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
-	strudelView = new StrudelView(context.extensionUri);
+	const outputChannel = vscode.window.createOutputChannel('Strudel');
+	context.subscriptions.push(outputChannel);
+
+	strudelView = new StrudelView(context.extensionUri, outputChannel);
 
 	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 	statusBarItem.text = '$(mute) Strudel';

@@ -4,9 +4,11 @@ export class StrudelView implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'strudel-tools.playerView';
 	private _view?: vscode.WebviewView;
 	private readonly _extensionUri: vscode.Uri;
+	private readonly _outputChannel: vscode.OutputChannel;
 
-	constructor(extensionUri: vscode.Uri) {
+	constructor(extensionUri: vscode.Uri, outputChannel: vscode.OutputChannel) {
 		this._extensionUri = extensionUri;
+		this._outputChannel = outputChannel;
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView): void {
@@ -21,6 +23,24 @@ export class StrudelView implements vscode.WebviewViewProvider {
 		};
 
 		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+
+		webviewView.webview.onDidReceiveMessage((msg: { type: string; value?: string }) => {
+			switch (msg.type) {
+				case 'status':
+					this._outputChannel.appendLine(`[status] ${msg.value}`);
+					break;
+				case 'error':
+					this._outputChannel.appendLine(`[error] ${msg.value}`);
+					vscode.window.showErrorMessage(`Strudel: ${msg.value}`);
+					break;
+				case 'log':
+					this._outputChannel.appendLine(`[webview] ${msg.value}`);
+					break;
+				case 'ready':
+					this._outputChannel.appendLine('[webview] ready');
+					break;
+			}
+		});
 	}
 
 	public sendCode(code: string): void {
@@ -45,9 +65,9 @@ export class StrudelView implements vscode.WebviewViewProvider {
 	<meta charset="UTF-8">
 	<meta http-equiv="Content-Security-Policy"
 		content="default-src 'none';
-			script-src ${webview.cspSource};
+			script-src ${webview.cspSource} blob:;
 			style-src ${webview.cspSource};
-			connect-src https:;">
+			connect-src https: blob:;">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="${styleUri}" rel="stylesheet">
 	<title>Strudel Player</title>
